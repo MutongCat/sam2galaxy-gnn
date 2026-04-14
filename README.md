@@ -30,7 +30,7 @@ Supported input routes:
 
 The public `halo_hdf5 -> graph` route is inference-only. It does not build labels or train-time cache fields.
 
-The large halo HDF5 input is distributed separately from the Git repository. Put `galacticus_Uchuu_rockstar.hdf5` at `data/halo_hdf5/galacticus_Uchuu_rockstar.hdf5` after downloading it from the project release assets or archival record. See [data/halo_hdf5/README.md](data/halo_hdf5/README.md).
+The large halo HDF5 input is distributed separately from the Git repository as a compressed release asset. Download `galacticus_Uchuu_rockstar.hdf5.gz`, decompress it, and place the extracted file at `data/halo_hdf5/galacticus_Uchuu_rockstar.hdf5`. See [data/halo_hdf5/README.md](data/halo_hdf5/README.md).
 
 ## Output Semantics
 
@@ -61,7 +61,7 @@ Validate that the packaged models, scaler, mapping, and example assets are prese
 python scripts/validate_release.py
 ```
 
-If you plan to use the `halo_hdf5` route, download `galacticus_Uchuu_rockstar.hdf5` first and place it at `data/halo_hdf5/galacticus_Uchuu_rockstar.hdf5`.
+If you plan to use the `halo_hdf5` route, download `galacticus_Uchuu_rockstar.hdf5.gz`, run `gunzip galacticus_Uchuu_rockstar.hdf5.gz`, and place the extracted file at `data/halo_hdf5/galacticus_Uchuu_rockstar.hdf5`.
 
 Run single-model inference on the example graph input:
 
