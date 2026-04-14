@@ -1,0 +1,21 @@
+model:
+  in_dim: 14
+  u_dim: 17
+  out_dim_per_z: 5
+  hidden_dim: 128
+  num_z: 9
+  use_moe: true
+  mix_hidden_dim: 128
+  mix_hidden_layers: 2
+  mix_dropout: 0.2
+  ssfr_mix_components: 3
+  ssfr_mix_continuous: 2
+  gas_mix_components: 4
+  gas_mix_continuous: 3
+  reg_head_type: hetero
+  reg_sigma_min: -7.0
+  reg_sigma_max: 7.0
+eval:
+  mix_point_estimate: map
+  ssfr_point_sigma: 0.15
+  gas_point_sigma: 0.05

@@ -1,0 +1,9 @@
+{
+  "input_format": "graph",
+  "source_path": "/home/ubuntu/SAM2Galaxy/sam2galaxy-gnn/examples/input/graph_input/graph.pt",
+  "num_nodes": 12926,
+  "num_node_features": 14,
+  "num_edges": 12926,
+  "has_tree_id": true,
+  "has_sam_parameters": false
+}

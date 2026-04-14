@@ -1,0 +1,57 @@
+{
+  "num_prediction_rows": 58385,
+  "num_truth_rows": 58385,
+  "num_joined_rows": 58385,
+  "coverage_fraction": 1.0,
+  "sam_ids": [
+    12,
+    18,
+    49,
+    218,
+    269,
+    307,
+    350,
+    512
+  ],
+  "targets": {
+    "stellar_mass": {
+      "regression_row_count": 58385,
+      "bias": 0.007846826676831543,
+      "sigma": 0.24994828070680786,
+      "mae": 0.17103127310657232,
+      "r2": 0.9396966363804125
+    },
+    "sdss_z_band_luminosity": {
+      "regression_row_count": 58385,
+      "bias": 0.019709372587825496,
+      "sigma": 0.26445532790366927,
+      "mae": 0.17455258030102067,
+      "r2": 0.8892534914092161
+    },
+    "angular_momentum": {
+      "regression_row_count": 58385,
+      "bias": 0.013922946028608548,
+      "sigma": 0.3398574577734877,
+      "mae": 0.2413477863587163,
+      "r2": 0.8968273155436544
+    },
+    "gas_metal_mass": {
+      "regression_row_count": 53001,
+      "bias": 0.11293282244606184,
+      "sigma": 0.6399564387199446,
+      "mae": 0.319873096385866,
+      "r2": 0.6958870021596942
+    },
+    "specific_star_formation_rate": {
+      "regression_row_count": 51523,
+      "bias": 0.0708048223513262,
+      "sigma": 0.28094594055899313,
+      "mae": 0.17666055491637747,
+      "r2": 0.8050148071076146
+    }
+  },
+  "classification": {
+    "quench_f1": 0.5310965630114567,
+    "gas_floor_f1": 0.2220472440944882
+  }
+}

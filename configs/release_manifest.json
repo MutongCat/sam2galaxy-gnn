@@ -1,0 +1,31 @@
+{
+  "single_model": {
+    "name": "selected_single_model_baseline",
+    "config_path": "single_model_eval.yaml",
+    "models_dir": "../models/single",
+    "checkpoint_path": "../models/single/selected_single_model_baseline.pt",
+    "scaler_path": "../scalers/ensemble_train_6480_scalers.pt"
+  },
+  "ensemble_model": {
+    "name": "full_48",
+    "config_path": "ensemble_full_48_eval.yaml",
+    "checkpoint_list_path": "../models/ensemble/full_48_ckpts.txt",
+    "scaler_path": "../scalers/ensemble_train_6480_scalers.pt"
+  },
+  "example_inputs": {
+    "halo_hdf5_path": "../data/halo_hdf5/galacticus_Uchuu_rockstar.hdf5",
+    "node_index_to_tree_id_path": "../data/tree_mappings/node_index_to_tree_id.pt",
+    "graph_path": "../examples/input/graph_input/graph.pt",
+    "tree_ids_path": "../examples/input/tree_input/tree_ids.txt",
+    "sam_parameters_path": "../examples/input/graph_input/sam_parameters.dat",
+    "target_indicator_path": "../examples/input/graph_input/target_indicator.csv",
+    "truth_path": "../examples/input/graph_input/truth_values.csv"
+  },
+  "output_targets": [
+    "stellar_mass",
+    "sdss_z_band_luminosity",
+    "angular_momentum",
+    "gas_metal_mass",
+    "specific_star_formation_rate"
+  ]
+}
