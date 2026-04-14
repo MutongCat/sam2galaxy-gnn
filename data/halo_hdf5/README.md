@@ -2,14 +2,21 @@
 
 The released halo HDF5 file is not stored in the Git repository because it is too large for the repository history.
 
-Expected filename:
+Download the compressed release asset:
 
-- `galacticus_Uchuu_rockstar.hdf5`
+- `galacticus_Uchuu_rockstar.hdf5.gz`
 
-Download the file from the project release assets or archival record, then place it in this directory so the default example path works:
+After downloading, decompress it and place the extracted file in this directory so the default example path works:
 
 ```text
 data/halo_hdf5/galacticus_Uchuu_rockstar.hdf5
+```
+
+Example:
+
+```bash
+gunzip galacticus_Uchuu_rockstar.hdf5.gz
+mv galacticus_Uchuu_rockstar.hdf5 data/halo_hdf5/
 ```
 
 If you publish the file through GitHub Releases or Zenodo, add the final download URL here before making the repository public.
