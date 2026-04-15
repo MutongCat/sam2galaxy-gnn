@@ -19,3 +19,4 @@ gunzip galacticus_Uchuu_rockstar.hdf5.gz
 mv galacticus_Uchuu_rockstar.hdf5 data/halo_hdf5/
 ```
 
+If you publish the file through GitHub Releases or Zenodo, add the final download URL here before making the repository public.

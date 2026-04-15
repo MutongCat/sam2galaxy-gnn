@@ -4,15 +4,36 @@
 
 ## Installation
 
-Create a Python 3.10+ environment, install PyTorch for your platform, then install this package from the repository root:
+Use Python 3.10 or newer. Two common setup paths are shown below.
+
+### Conda
 
 ```bash
+conda create -n sam2galaxy-gnn python=3.10
+conda activate sam2galaxy-gnn
 python -m pip install --upgrade pip
 python -m pip install torch
 python -m pip install -e .
 ```
 
-If you already have a compatible PyTorch install, `pip install -e .` will install the remaining package dependencies. After installation, the CLI command `sam2galaxy-gnn` is available from the environment.
+### venv
+
+```bash
+python3.10 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install torch
+python -m pip install -e .
+```
+
+Install from the repository root:
+
+```bash
+cd sam2galaxy-gnn
+python -m pip install -e .
+```
+
+If you already have a compatible PyTorch install, `pip install -e .` installs the remaining package dependencies. After installation, the CLI command `sam2galaxy-gnn` is available from the environment.
 
 ## What It Does
 
@@ -55,15 +76,13 @@ The model predicts conditional galaxy properties. It does not decide whether a h
 
 ## Quickstart
 
-Validate that the packaged models, scaler, mapping, and example assets are present:
+1. Validate that the packaged models, scaler, mapping, and example assets are present:
 
 ```bash
 python scripts/validate_release.py
 ```
 
-If you plan to use the `halo_hdf5` route, download `galacticus_Uchuu_rockstar.hdf5.gz`, run `gunzip galacticus_Uchuu_rockstar.hdf5.gz`, and place the extracted file at `data/halo_hdf5/galacticus_Uchuu_rockstar.hdf5`.
-
-Run single-model inference on the example graph input:
+2. Run the recommended first example on the packaged graph input:
 
 ```bash
 sam2galaxy-gnn \
@@ -78,7 +97,9 @@ sam2galaxy-gnn \
   --model-type single
 ```
 
-Run single-model inference from the halo HDF5 route:
+This writes a prediction catalog to `/tmp/example_single_from_graph.csv`.
+
+3. If you want to run from the original halo HDF5 instead of the packaged graph, first download `galacticus_Uchuu_rockstar.hdf5.gz`, run `gunzip galacticus_Uchuu_rockstar.hdf5.gz`, place the extracted file at `data/halo_hdf5/galacticus_Uchuu_rockstar.hdf5`, and then run:
 
 ```bash
 sam2galaxy-gnn \
@@ -94,7 +115,7 @@ sam2galaxy-gnn \
   --model-type single
 ```
 
-Generate the packaged example outputs:
+To regenerate the packaged example outputs and summaries, use:
 
 ```bash
 python scripts/generate_example_eval_outputs.py \
