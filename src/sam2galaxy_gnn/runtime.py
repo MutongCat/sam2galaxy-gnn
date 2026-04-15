@@ -180,6 +180,34 @@ def _mix_point_est_with_prob(
     return pred, floor_prob
 
 
+def _mix_predictive_sigma(
+    mix_tuple: Any,
+    *,
+    floor_norm: float,
+    floor_sigma_phys: float,
+    std_norm: float,
+) -> torch.Tensor | None:
+    if mix_tuple is None:
+        return None
+    mix_logits, mu, log_sigma = mix_tuple
+    weights = torch.softmax(mix_logits, dim=-1)
+    sigma_floor = max(1e-6, float(floor_sigma_phys)) / float(std_norm)
+    floor_mean = torch.full(
+        (weights.shape[0], 1),
+        float(floor_norm),
+        dtype=mu.dtype,
+        device=mu.device,
+    )
+    floor_var = torch.full_like(floor_mean, float(sigma_floor) ** 2)
+    cont_var = torch.exp(2.0 * log_sigma)
+    comp_mean = torch.cat([floor_mean, mu], dim=-1)
+    comp_var = torch.cat([floor_var, cont_var], dim=-1)
+    second_moment = (weights * (comp_var + comp_mean.square())).sum(dim=-1)
+    mean = (weights * comp_mean).sum(dim=-1)
+    variance = (second_moment - mean.square()).clamp_min(0.0)
+    return torch.sqrt(variance)
+
+
 def build_inference_batches(
     graph: Data,
     *,
@@ -299,7 +327,25 @@ def run_model_on_batches(
                 qprob_rows.append(qprob)
                 gprob_rows.append(gprob)
                 if reg_sigma is not None:
-                    sigma_rows.append(torch.exp(reg_sigma) * scaler.y_std.unsqueeze(0))
+                    sigma_phys = torch.exp(reg_sigma) * scaler.y_std.unsqueeze(0)
+                    if mix:
+                        ssfr_mix_sigma = _mix_predictive_sigma(
+                            mix.get("ssfr"),
+                            floor_norm=ssfr_floor_norm,
+                            floor_sigma_phys=ssfr_point_sigma,
+                            std_norm=float(scaler.y_std[4]),
+                        )
+                        gas_mix_sigma = _mix_predictive_sigma(
+                            mix.get("gas"),
+                            floor_norm=gas_floor_norm,
+                            floor_sigma_phys=gas_point_sigma,
+                            std_norm=float(scaler.y_std[3]),
+                        )
+                        if ssfr_mix_sigma is not None:
+                            sigma_phys[:, 4] = ssfr_mix_sigma * scaler.y_std[4]
+                        if gas_mix_sigma is not None:
+                            sigma_phys[:, 3] = gas_mix_sigma * scaler.y_std[3]
+                    sigma_rows.append(sigma_phys)
                 else:
                     sigma_rows.append(torch.full_like(reg_phys, float("nan")))
 

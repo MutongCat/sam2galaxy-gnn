@@ -24,7 +24,7 @@ def _majority_mean_from_hard(
     hard_masks: list["torch.Tensor"],
     *,
     floor_value: float,
-) -> tuple["torch.Tensor", "torch.Tensor", "torch.Tensor"]:
+) -> tuple["torch.Tensor", "torch.Tensor"]:
     import torch
 
     pred_stack = torch.stack(point_preds, dim=0).to(torch.float32)
@@ -42,10 +42,21 @@ def _majority_mean_from_hard(
         torch.full_like(cont_sum, float(floor_value)),
     )
     pred_out[~majority_mask] = cont_mean[~majority_mask]
-
-    pred_std = pred_stack.std(dim=0, unbiased=False) if pred_stack.shape[0] > 1 else torch.zeros_like(pred_out)
     prob_out = votes.to(torch.float32) / float(pred_stack.shape[0])
-    return pred_out, pred_std, prob_out
+    return pred_out, prob_out
+
+
+def _total_sigma(
+    mean_stack: "torch.Tensor",
+    sigma_stack: "torch.Tensor",
+    *,
+    final_mean: "torch.Tensor",
+) -> "torch.Tensor":
+    import torch
+
+    aleatoric = (sigma_stack.to(torch.float32) ** 2).mean(dim=0)
+    epistemic = ((mean_stack.to(torch.float32) - final_mean.unsqueeze(0)) ** 2).mean(dim=0)
+    return torch.sqrt((aleatoric + epistemic).clamp_min(0.0))
 
 
 def predict_ensemble(
@@ -82,44 +93,61 @@ def predict_ensemble(
         matched_z_values=targets.matched_z_values,
     )
     predictions = []
+    prediction_sigma = []
     quench_probs = []
     gas_probs = []
     ssfr_point_preds = []
+    ssfr_point_sigma = []
     ssfr_hard_masks = []
     gas_point_preds = []
+    gas_point_sigma = []
     gas_hard_masks = []
     for ckpt in ckpts:
         model = build_model_from_config(artifact.config_path, ckpt, device=device)
         payload = run_model_on_batches(model, batches, scaler=scaler, device=device)
         predictions.append(payload["prediction"])
+        prediction_sigma.append(payload["prediction_sigma"])
         quench_probs.append(payload["quench_probability"])
         gas_probs.append(payload["gas_floor_probability"])
         ssfr_point_preds.append(payload["prediction"][:, 4])
+        ssfr_point_sigma.append(payload["prediction_sigma"][:, 4])
         ssfr_hard_masks.append(payload["prediction"][:, 4] <= (SSFR_QUENCH_THRESHOLD + 1e-8))
         gas_point_preds.append(payload["prediction"][:, 3])
+        gas_point_sigma.append(payload["prediction_sigma"][:, 3])
         gas_hard_masks.append(payload["prediction"][:, 3] <= (GAS_FLOOR_VALUE + 1e-8))
 
     pred_stack = torch.stack(predictions, dim=0)
+    sigma_stack = torch.stack(prediction_sigma, dim=0)
     pred_mean = pred_stack.mean(dim=0)
-    pred_std = pred_stack.std(dim=0, unbiased=False)
+    pred_std = _total_sigma(pred_stack, sigma_stack, final_mean=pred_mean)
     q_mean = torch.stack(quench_probs, dim=0).mean(dim=0)
     g_mean = torch.stack(gas_probs, dim=0).mean(dim=0)
 
-    ssfr_pred_ens, ssfr_std_ens, ssfr_prob_ens = _majority_mean_from_hard(
+    ssfr_pred_ens, ssfr_prob_ens = _majority_mean_from_hard(
         ssfr_point_preds,
         ssfr_hard_masks,
         floor_value=SSFR_QUENCH_THRESHOLD,
     )
-    gas_pred_ens, gas_std_ens, gas_prob_ens = _majority_mean_from_hard(
+    gas_pred_ens, gas_prob_ens = _majority_mean_from_hard(
         gas_point_preds,
         gas_hard_masks,
         floor_value=GAS_FLOOR_VALUE,
     )
+    ssfr_sigma_ens = _total_sigma(
+        torch.stack(ssfr_point_preds, dim=0),
+        torch.stack(ssfr_point_sigma, dim=0),
+        final_mean=ssfr_pred_ens,
+    )
+    gas_sigma_ens = _total_sigma(
+        torch.stack(gas_point_preds, dim=0),
+        torch.stack(gas_point_sigma, dim=0),
+        final_mean=gas_pred_ens,
+    )
     pred_mean[:, 4] = ssfr_pred_ens
-    pred_std[:, 4] = ssfr_std_ens
+    pred_std[:, 4] = ssfr_sigma_ens
     q_mean = ssfr_prob_ens
     pred_mean[:, 3] = gas_pred_ens
-    pred_std[:, 3] = gas_std_ens
+    pred_std[:, 3] = gas_sigma_ens
     g_mean = gas_prob_ens
 
     base = payload
