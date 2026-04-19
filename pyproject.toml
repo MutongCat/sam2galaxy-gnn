@@ -1,22 +1,22 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "sam2galaxy-gnn"
-version = "0.1.0"
+version = "0.1.2"
 description = "Public release scaffold for SAM2Galaxy GNN inference."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 authors = [
   { name = "SAM2Galaxy" }
 ]
 dependencies = [
-  "PyYAML",
-  "h5py",
-  "numpy",
-  "torch",
-  "torch-geometric",
+  "PyYAML>=6.0",
+  "h5py>=3.10",
+  "numpy>=1.26",
+  "torch>=2.0",
+  "torch-geometric>=2.5",
 ]
 
 [project.scripts]

@@ -4,25 +4,37 @@
 
 ## Installation
 
-Use Python 3.10 or newer. Two common setup paths are shown below.
+Use Python 3.9 or newer. The current public package has been tested with `torch 2.0.x`, `torch-geometric 2.6.x`, `numpy 1.26.x`, `h5py 3.12.x`, and `PyYAML 6.x`.
+
+Before installing the package itself, first upgrade the packaging toolchain inside the environment:
+
+```bash
+python -m pip install --upgrade pip setuptools wheel
+```
+
+Then install a compatible PyTorch stack for your platform. The examples below assume that `torch` and `torch-geometric` are installed before `pip install -e .`.
 
 ### Conda
 
 ```bash
-conda create -n sam2galaxy-gnn python=3.10
+conda create -n sam2galaxy-gnn python=3.9
 conda activate sam2galaxy-gnn
 python -m pip install --upgrade pip
-python -m pip install torch
+python -m pip install --upgrade setuptools wheel
+python -m pip install "torch>=2.0,<2.1"
+python -m pip install "torch-geometric>=2.6,<2.7"
 python -m pip install -e .
 ```
 
 ### venv
 
 ```bash
-python3.10 -m venv .venv
+python3.9 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install torch
+python -m pip install --upgrade setuptools wheel
+python -m pip install "torch>=2.0,<2.1"
+python -m pip install "torch-geometric>=2.6,<2.7"
 python -m pip install -e .
 ```
 
@@ -34,6 +46,8 @@ python -m pip install -e .
 ```
 
 If you already have a compatible PyTorch install, `pip install -e .` installs the remaining package dependencies. After installation, the CLI command `sam2galaxy-gnn` is available from the environment.
+
+If `h5py` fails to build because the system HDF5 library is unavailable, install `h5py` and `hdf5` through your package manager or through `conda-forge` before installing this package.
 
 ## What It Does
 
